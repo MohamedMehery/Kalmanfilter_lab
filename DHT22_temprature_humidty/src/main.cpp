@@ -42,7 +42,7 @@
 #define FEATURE_RTC         1     // <<< NOW ACTUALLY USED
 #define FEATURE_DHT         1
 #define FEATURE_KALMAN      1
-#define FEATURE_TESTBENCH   1     // 1 = science mode
+#define FEATURE_TESTBENCH   0     // 1 = science mode
 
 /* ================================================================
  *                    TESTBENCH CONFIGURATION
@@ -391,11 +391,33 @@ bool dht22_read(float *temperature, float *humidity){
         if ((micros() - ts) > 40) data[byte_idx] |= (1 << bit_idx);
         if (bit_idx == 0) { bit_idx = 7; byte_idx++; } else bit_idx--;
     }
+
+    /* ---- Checksum ---- */
     if (((data[0]+data[1]+data[2]+data[3]) & 0xFF) != data[4]) return false;
-    *humidity = ((data[0]<<8)|data[1]) / 10.0f;
-    int16_t t = ((data[2]&0x7F)<<8) | data[3];
-    if (data[2] & 0x80) t = -t;
-    *temperature = t / 10.0f;
+
+    /* ---- Decode ---- */
+    float h = ((data[0] << 8) | data[1]) / 10.0f;
+    int16_t traw = ((data[2] & 0x7F) << 8) | data[3];
+    if (data[2] & 0x80) traw = -traw;
+    float t = traw / 10.0f;
+
+    /* ================================================================
+     *  SANITY VALIDATION  (NEW — fixes the “73.4°C / ovf / 4294967295”
+     *  problem you observed)
+     *
+     *  Even when the checksum passes, the Wokwi DHT22 model can return
+     *  frames whose decoded T or H are nonsense (NaN, Inf, or out of
+     *  the sensor's specified range).  We reject anything outside the
+     *  DHT22 datasheet limits:
+     *       T : -40 .. +80  °C
+     *       H :   0 .. 100  %RH
+     *  This is the same gate a real driver should always have.
+     * ================================================================ */
+    if (isnan(t) || isinf(t) || t < -40.0f || t >  80.0f) return false;
+    if (isnan(h) || isinf(h) || h <   0.0f || h > 100.0f) return false;
+
+    *temperature = t;
+    *humidity    = h;
     return true;
 }
 #endif
@@ -441,6 +463,9 @@ static void Kalman_Tune(KalmanFilter_t *kf, float measurement, float dt_s){
 }
 
 float Kalman_Update(KalmanFilter_t *kf, float measurement){
+    /* Defensive: never let a bad measurement poison the filter. */
+    if (isnan(measurement) || isinf(measurement)) return kf->x;
+
     uint32_t now = millis();
     if (!kf->initialized) {
         kf->x = measurement;
@@ -475,6 +500,8 @@ void FixedKF_Init(FixedKalmanFilter_t *kf, float Q, float R){
 }
 
 float FixedKF_Update(FixedKalmanFilter_t *kf, float z){
+    /* Defensive: never let a bad measurement poison the filter. */
+    if (isnan(z) || isinf(z)) return kf->x;
     uint32_t now = millis();
     if (!kf->initialized) {
         kf->x = z; kf->P = 1.0f;
@@ -600,7 +627,7 @@ void update_display_testbench(float t, uint8_t sid,
                               float truth, float fixed, float adapt){
 #if FEATURE_LCD
     char buf[21];
-    lcd_set_cursor(0, 0); lcd_print("KF Testbench  v1.1  ");
+    lcd_set_cursor(0, 0); lcd_print("KF Testbench  v1.2  ");
     lcd_set_cursor(1, 0);
     snprintf(buf, sizeof(buf), "t=%4d s  Scn=%d      ", (int)t, sid);
     lcd_print(buf);
@@ -826,29 +853,76 @@ void loop_live(){
     static unsigned long start_time  = millis();
     static unsigned long last_read   = 0;
     static unsigned long last_lcd    = 0;
+    static uint32_t      ok_count    = 0;
+    static uint32_t      fail_count  = 0;
+    static bool          header_done = false;
+
+    /* Print the CSV header exactly once, on first entry into the loop. */
+    if (!header_done) {
+        Serial.println();
+        Serial.println(F("t_s,rtc_hms,raw_x,fixed_x,adapt_x,humidity,"
+                         "adapt_Q,adapt_R,adapt_K,status"));
+        header_done = true;
+    }
+
     unsigned long now = millis();
 
     if (now - last_read >= 2000) {
         last_read = now;
         float t = (now - start_time) / 1000.0f;
-        float new_t, new_h;
-        if (dht22_read(&new_t, &new_h)) {
+
+        float new_t = 0.0f, new_h = 0.0f;
+        bool ok = dht22_read(&new_t, &new_h);
+
+        /* Second line of defence: even if dht22_read() said OK, double-
+         * check the value before letting it touch the Kalman filters. */
+        if (ok && (isnan(new_t) || isinf(new_t) ||
+                   new_t < -40.0f || new_t > 80.0f)) {
+            ok = false;
+        }
+
+        char hms[10];
+        rtc_format_hms(hms, sizeof(hms));
+
+        if (ok) {
+            ok_count++;
             rawTemperature      = new_t;
             rawHumidity         = new_h;
-            filteredTemperature = Kalman_Update(&tempFilter, rawTemperature);
+            filteredTemperature = Kalman_Update (&tempFilter,  rawTemperature);
             fixedTemperature    = FixedKF_Update(&fixedFilter, rawTemperature);
 
-            char hms[10]; rtc_format_hms(hms, sizeof(hms));
-            Serial.print(t, 1);   Serial.print(F("  "));
-            Serial.print(hms);    Serial.print(F("  "));
-            Serial.print(rawTemperature, 2);     Serial.print(F("    "));
-            Serial.print(fixedTemperature, 2);   Serial.print(F("    "));
-            Serial.println(filteredTemperature, 2);
+            /* CSV row — same shape as the testbench output */
+            Serial.print(t, 2);                    Serial.print(',');
+            Serial.print(hms);                     Serial.print(',');
+            Serial.print(rawTemperature, 2);       Serial.print(',');
+            Serial.print(fixedTemperature, 2);     Serial.print(',');
+            Serial.print(filteredTemperature, 2);  Serial.print(',');
+            Serial.print(rawHumidity, 1);          Serial.print(',');
+            Serial.print(tempFilter.Q, 5);         Serial.print(',');
+            Serial.print(tempFilter.R, 5);         Serial.print(',');
+            Serial.print(tempFilter.last_K, 4);    Serial.print(',');
+            Serial.println(F("OK"));
+        } else {
+            fail_count++;
+            /* Emit a clearly-marked row so the CSV stays parseable. */
+            Serial.print(t, 2);   Serial.print(',');
+            Serial.print(hms);    Serial.print(',');
+            Serial.print(F(",,,,,,,FAIL"));
+            Serial.println();
         }
     }
+
     if (now - last_lcd >= 500) {
         last_lcd = now;
         update_display_live(rawTemperature, filteredTemperature, rawHumidity);
+
+        /* Tiny diagnostic on the LCD: how many good vs failed reads. */
+#if FEATURE_LCD
+        char dbg[21];
+        snprintf(dbg, sizeof(dbg), "OK:%lu FAIL:%lu        ",
+                 (unsigned long)ok_count, (unsigned long)fail_count);
+        lcd_set_cursor(3, 0); lcd_print(dbg);
+#endif
     }
 }
 #endif

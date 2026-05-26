@@ -1,4 +1,4 @@
 [wokwi]
-version = 1.1
+version = 1.2
 firmware = ".pio/build/bluepill_f103c8/firmware.elf"
 
