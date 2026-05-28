@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "author": "",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-stm32-bluepill",
+      "id": "bluepill",
+      "top": -20.56,
+      "left": 178.77,
+      "attrs": {}
+    },
+    { "type": "wokwi-ds1307", "id": "rtc1", "top": -72.6, "left": 336.1, "attrs": {} },
+    {
+      "type": "wokwi-lcd2004",
+      "id": "lcd1",
+      "top": 64,
+      "left": 341.6,
+      "attrs": { "pins": "i2c" }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht1",
+      "top": -230.1,
+      "left": 340.2,
+      "attrs": { "humidity": "23", "temperature": "35.2" }
+    },
+    { "type": "wokwi-gnd", "id": "gnd1", "top": 278.4, "left": 306.6, "attrs": {} },
+    { "type": "wokwi-vcc", "id": "vcc1", "top": -268.04, "left": 316.8, "attrs": {} },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -92.6,
+      "left": 143.15,
+      "rotate": 270,
+      "attrs": { "value": "4700" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": -102.2,
+      "left": 123.95,
+      "rotate": 270,
+      "attrs": { "value": "4700" }
+    }
+  ],
+  "connections": [
+    [ "$serialMonitor:TX", "bluepill:A10", "", [] ],
+    [ "$serialMonitor:RX", "bluepill:A9", "", [] ],
+    [ "rtc1:SDA", "bluepill:B7", "green",  [ "h-182.4", "v162.9" ] ],
+    [ "rtc1:SCL", "bluepill:B6", "orange", [ "h-192",   "v143.8" ] ],
+    [ "lcd1:SDA", "bluepill:B7", "green",  [ "h-38.4", "v77",  "h-144",   "v-67.2" ] ],
+    [ "lcd1:SCL", "bluepill:B6", "orange", [ "h-19.2", "v86.7","h-172.8", "v-96"   ] ],
+    [ "dht1:SDA", "bluepill:A0", "blue",   [ "v19.2", "h-86.3", "v250" ] ],
+    [ "dht1:VCC", "vcc1:VCC", "red",   [ "v9.6",  "h-28.8", "v-57" ] ],
+    [ "dht1:GND", "gnd1:GND", "black", [ "v28.8", "h-67.2", "v345.6", "h48" ] ],
+    [ "lcd1:VCC", "vcc1:VCC", "red",   [ "h-19.2", "v-345.5", "h10" ] ],
+    [ "lcd1:GND", "gnd1:GND", "black", [ "h-28.8", "v163.2",  "h48" ] ],
+    [ "rtc1:5V",  "vcc1:VCC", "red",   [ "h-19.2", "v38.4" ] ],
+    [ "rtc1:GND", "gnd1:GND", "black", [ "h-28.8", "v316.8", "h48" ] ],
+    [ "r1:2", "vcc1:VCC",    "red",    [ "v-66",  "h153.6" ] ],
+    [ "r1:1", "bluepill:B7", "green",  [ "v19.2", "h-9.6", "v163.2" ] ],
+    [ "bluepill:B6", "r2:1", "orange", [ "h-38.4", "v-230.4" ] ],
+    [ "r2:2", "vcc1:VCC",    "red",    [ "v-46.8", "h172.8" ] ]
+  ],
+  "dependencies": {}
+}
