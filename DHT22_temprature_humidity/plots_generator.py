@@ -2,7 +2,7 @@
 """
 plot_kalman_results.py
 ----------------------
-Cleans corrupted CSV exported from the STM32 Kalman testbench,
+Cleans CSV exported from the STM32 Kalman testbench,
 generates publication-quality plots, and saves them to ./plots/
 """
 

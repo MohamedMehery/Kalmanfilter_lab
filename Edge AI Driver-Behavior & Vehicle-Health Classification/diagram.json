@@ -1,0 +1,146 @@
+{
+"version": 1,
+"author": "Mohamed Abdelnasser Mehery",
+"editor": "wokwi",
+"parts": [
+{
+"type": "board-stm32-bluepill",
+"id": "bluepill",
+"top": -20.56,
+"left": 178.77,
+"attrs": {}
+},
+{
+"type": "wokwi-ssd1306",
+"id": "oled",
+"top": -190,
+"left": 390,
+"attrs": { "i2cAddress": "0x3c" }
+},
+{ "type": "wokwi-mpu6050", "id": "mpu", "top": -180, "left": 10, "attrs": {} },
+{ "type": "wokwi-ntc-temperature-sensor", "id": "ntc", "top": 240, "left": 20, "attrs": {} },
+{ "type": "wokwi-potentiometer", "id": "pot", "top": 238.7, "left": 383.8, "attrs": {} },
+{ "type": "wokwi-relay-module", "id": "relay", "top": 40, "left": 500, "attrs": {} },
+{
+"type": "wokwi-buzzer",
+"id": "buzzer",
+"top": 180,
+"left": 610,
+"attrs": { "volume": "0.15" }
+},
+{
+"type": "wokwi-pushbutton",
+"id": "btnReset",
+"top": 360,
+"left": 240,
+"attrs": { "color": "red", "label": "RESET" }
+},
+{
+"type": "wokwi-led",
+"id": "ledNormal",
+"top": -70,
+"left": 770,
+"attrs": { "color": "green", "label": "NORMAL" }
+},
+{
+"type": "wokwi-led",
+"id": "ledLowPower",
+"top": 10,
+"left": 770,
+"attrs": { "color": "blue", "label": "LOW POWER" }
+},
+{
+"type": "wokwi-led",
+"id": "ledFault",
+"top": 90,
+"left": 770,
+"attrs": { "color": "red", "label": "FAULT" }
+},
+{
+"type": "wokwi-led",
+"id": "ledLoad",
+"top": 260,
+"left": 770,
+"attrs": { "color": "white", "label": "LOAD" }
+},
+{
+"type": "wokwi-resistor",
+"id": "rGreen",
+"top": -30,
+"left": 690,
+"attrs": { "value": "330" }
+},
+{
+"type": "wokwi-resistor",
+"id": "rBlue",
+"top": 50,
+"left": 690,
+"attrs": { "value": "330" }
+},
+{
+"type": "wokwi-resistor",
+"id": "rRed",
+"top": 130,
+"left": 690,
+"attrs": { "value": "330" }
+},
+{
+"type": "wokwi-resistor",
+"id": "rLoad",
+"top": 300,
+"left": 690,
+"attrs": { "value": "330" }
+},
+{
+"type": "wokwi-text",
+"id": "title",
+"top": -255,
+"left": 0,
+"attrs": {
+"text": "Smart Power + Wearable Telemetry Gateway\nSTM32 Blue Pill | I2C | ADC | Telemetry | Power Management"
+}
+}
+],
+"connections": [
+[ "bluepill:B7", "oled:SDA", "green", [] ],
+[ "bluepill:B6", "oled:SCL", "blue", [] ],
+[ "bluepill:3V3.1", "oled:VCC", "red", [] ],
+[ "bluepill:GND.1", "oled:GND", "black", [] ],
+[ "bluepill:B7", "mpu:SDA", "green", [] ],
+[ "bluepill:B6", "mpu:SCL", "blue", [] ],
+[ "bluepill:3V3.1", "mpu:VCC", "red", [] ],
+[ "bluepill:GND.1", "mpu:GND", "black", [] ],
+[ "mpu:AD0", "bluepill:GND.1", "black", [] ],
+[ "mpu:INT", "bluepill:B15", "yellow", [] ],
+[ "ntc:VCC", "bluepill:3V3.1", "red", [] ],
+[ "ntc:GND", "bluepill:GND.1", "black", [] ],
+[ "ntc:OUT", "bluepill:A0", "orange", [] ],
+[ "pot:VCC", "bluepill:3V3.1", "red", [] ],
+[ "pot:GND", "bluepill:GND.1", "black", [] ],
+[ "pot:SIG", "bluepill:A1", "orange", [] ],
+[ "relay:VCC", "bluepill:3V3.1", "red", [] ],
+[ "relay:GND", "bluepill:GND.1", "black", [] ],
+[ "relay:IN", "bluepill:B12", "orange", [] ],
+[ "relay:COM", "bluepill:3V3.2", "red", [] ],
+[ "relay:NO", "rLoad:1", "purple", [] ],
+[ "rLoad:2", "ledLoad:A", "purple", [] ],
+[ "ledLoad:C", "bluepill:GND.1", "black", [] ],
+[ "buzzer:1", "bluepill:B13", "orange", [] ],
+[ "buzzer:2", "bluepill:GND.1", "black", [] ],
+[ "btnReset:1.r", "bluepill:B14", "gray", [] ],
+[ "btnReset:2.r", "bluepill:GND.1", "black", [] ],
+[ "bluepill:B0", "rGreen:1", "green", [] ],
+[ "rGreen:2", "ledNormal:A", "green", [] ],
+[ "ledNormal:C", "bluepill:GND.1", "black", [] ],
+[ "bluepill:B1", "rBlue:1", "blue", [] ],
+[ "rBlue:2", "ledLowPower:A", "blue", [] ],
+[ "ledLowPower:C", "bluepill:GND.1", "black", [] ],
+[ "bluepill:A8", "rRed:1", "red", [] ],
+[ "rRed:2", "ledFault:A", "red", [] ],
+[ "ledFault:C", "bluepill:GND.1", "black", [] ],
+[ "bluepill:A9", "$serialMonitor:RX", "green", [] ],
+[ "bluepill:A10", "$serialMonitor:TX", "green", [] ]
+],
+"serialMonitor": { "display": "always", "newline": "lf" },
+"dependencies": {}
+}
