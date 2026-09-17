@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "author": "Mohamed Abdelnasser Mehery",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+
+    { "type": "wokwi-led", "id": "led_ok", "top": -60, "left": 180,
+      "attrs": { "color": "green", "label": "HEALTHY" } },
+    { "type": "wokwi-led", "id": "led_warn", "top": -60, "left": 230,
+      "attrs": { "color": "red", "label": "ALARM" } },
+    { "type": "wokwi-resistor", "id": "r1", "top": -10, "left": 180, "attrs": { "value": "220" } },
+    { "type": "wokwi-resistor", "id": "r2", "top": -10, "left": 230, "attrs": { "value": "220" } },
+
+    { "type": "wokwi-buzzer", "id": "bz", "top": -60, "left": 300, "attrs": { "volume": "0.1" } },
+    { "type": "wokwi-relay-module", "id": "relay", "top": 60, "left": 300, "attrs": {} },
+
+    { "type": "wokwi-potentiometer", "id": "pot_oil", "top": 160, "left": -150,
+      "attrs": { "label": "oil temp" } },
+    { "type": "wokwi-potentiometer", "id": "pot_wind", "top": 260, "left": -150,
+      "attrs": { "label": "winding temp" } },
+
+    { "type": "wokwi-text", "id": "note", "top": -120, "left": 0,
+      "attrs": { "text": "APP_MODE 0 = replay bundled test rows. Watch the serial JSON.", "size": "14" } }
+  ],
+  "connections": [
+    [ "esp:GND.1", "led_ok:C", "black", [ "v0" ] ],
+    [ "esp:D2", "r1:1", "green", [ "v0" ] ],
+    [ "r1:2", "led_ok:A", "green", [ "v0" ] ],
+
+    [ "esp:GND.1", "led_warn:C", "black", [ "v0" ] ],
+    [ "esp:D4", "r2:1", "red", [ "v0" ] ],
+    [ "r2:2", "led_warn:A", "red", [ "v0" ] ],
+
+    [ "esp:D17", "bz:1", "purple", [ "v0" ] ],
+    [ "esp:GND.1", "bz:2", "black", [ "v0" ] ],
+
+    [ "esp:D16", "relay:IN", "orange", [ "v0" ] ],
+    [ "esp:5V", "relay:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "relay:GND", "black", [ "v0" ] ],
+
+    [ "esp:3V3", "pot_oil:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "pot_oil:GND", "black", [ "v0" ] ],
+    [ "esp:D27", "pot_oil:SIG", "blue", [ "v0" ] ],
+
+    [ "esp:3V3", "pot_wind:VCC", "red", [ "v0" ] ],
+    [ "esp:GND.1", "pot_wind:GND", "black", [ "v0" ] ],
+    [ "esp:D14", "pot_wind:SIG", "blue", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

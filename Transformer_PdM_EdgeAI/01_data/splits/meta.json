@@ -1,0 +1,68 @@
+{
+  "features": [
+    "VL1",
+    "VL2",
+    "VL3",
+    "IL1",
+    "IL2",
+    "IL3",
+    "OTI",
+    "WTI",
+    "ATI",
+    "OLI",
+    "V_avg",
+    "I_avg",
+    "V_unbal",
+    "I_unbal",
+    "load_pu",
+    "dT_oil_amb",
+    "dT_wind_oil",
+    "OTI_roc",
+    "WTI_roc",
+    "WTI_trend_1h",
+    "OTI_trend_1h",
+    "sev_now",
+    "margin_wti"
+  ],
+  "n_features": 23,
+  "window": 16,
+  "horizon": 8,
+  "i_rated": 1449.0,
+  "rows_raw": 40320,
+  "sequences": {
+    "train": 28183,
+    "dev": 6020,
+    "test": 6046
+  },
+  "class_balance": {
+    "train": [
+      25339,
+      2310,
+      534
+    ],
+    "dev": [
+      5332,
+      563,
+      125
+    ],
+    "test": [
+      5599,
+      350,
+      97
+    ]
+  },
+  "wti_stats": {
+    "mean": 62.033164978027344,
+    "std": 14.306283950805664
+  },
+  "early_warning": {
+    "train": 1145,
+    "dev": 157,
+    "test": 236
+  },
+  "persistence_acc": {
+    "train": 0.9466699783557464,
+    "dev": 0.9601328903654485,
+    "test": 0.9545153820707906
+  }
+}

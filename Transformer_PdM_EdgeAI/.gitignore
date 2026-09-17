@@ -1,0 +1,22 @@
+# --- build / env -----------------------------------------------------------
+.venv/
+__pycache__/
+*.pyc
+.pio/
+.vscode/.browse*
+
+# --- generated data (regenerate with run_all.sh) ---------------------------
+01_data/raw/*.csv
+01_data/splits/*.npz
+01_data/splits/*.csv
+
+# Keep the split metadata: it documents the exact shapes/baselines a run
+# produced and is only a couple of KB.
+!01_data/splits/meta.json
+
+# --- model artifacts -------------------------------------------------------
+artifacts/*.keras
+artifacts/*.h5
+# model_int8.tflite IS tracked on purpose: it is ~18 KB and is the thing the
+# firmware embeds, so it should be reviewable in a diff.
+!artifacts/model_int8.tflite
