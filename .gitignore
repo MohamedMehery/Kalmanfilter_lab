@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+

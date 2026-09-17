@@ -1,0 +1,64 @@
+{
+  "architecture": "Dense(28->16->8->1), sigmoid output",
+  "dev_metrics": {
+    "accuracy": 0.95,
+    "f1": 0.6149732620320856,
+    "roc_auc": 0.9597529544883079,
+    "pr_auc": 0.7403649275817036,
+    "confusion_matrix": [
+      [
+        2621,
+        95
+      ],
+      [
+        49,
+        115
+      ]
+    ]
+  },
+  "test_metrics": {
+    "accuracy": 0.9479166666666666,
+    "f1": 0.7869318181818182,
+    "roc_auc": 0.973141501680099,
+    "pr_auc": 0.8878101598521294,
+    "confusion_matrix": [
+      [
+        2453,
+        134
+      ],
+      [
+        16,
+        277
+      ]
+    ]
+  },
+  "test_classification_report": {
+    "0.0": {
+      "precision": 0.9935196435803969,
+      "recall": 0.9482025512176266,
+      "f1-score": 0.9703322784810127,
+      "support": 2587.0
+    },
+    "1.0": {
+      "precision": 0.6739659367396593,
+      "recall": 0.9453924914675768,
+      "f1-score": 0.7869318181818182,
+      "support": 293.0
+    },
+    "accuracy": 0.9479166666666666,
+    "macro avg": {
+      "precision": 0.8337427901600281,
+      "recall": 0.9467975213426016,
+      "f1-score": 0.8786320483314154,
+      "support": 2880.0
+    },
+    "weighted avg": {
+      "precision": 0.9610094921552802,
+      "recall": 0.9479166666666666,
+      "f1-score": 0.951673828874185,
+      "support": 2880.0
+    }
+  },
+  "tflite_float_bytes": 4768,
+  "tflite_quant_bytes": 3936
+}
