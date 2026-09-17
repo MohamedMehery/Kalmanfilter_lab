@@ -21,3 +21,23 @@ This folder contains an STM32 Bluepill Arduino project that reads temperature an
 - Use `platformio.ini` to build the STM32 Bluepill firmware.
 - Use `wokwi.toml` and `wokwi_schematic.json` to run the simulation in Wokwi.
 
+## Transformer_Predictive_Maintenance + Transformer_MCU_Deployment
+
+A two-stage predictive-maintenance project for a real distribution
+transformer, built on the [Distributed Transformer Monitoring](https://www.kaggle.com/datasets/sreshta140/ai-transformer-monitoring)
+Kaggle dataset (IoT sensor readings every ~15 minutes, 2019-06-25 to
+2020-04-14):
+
+- **[`Transformer_Predictive_Maintenance/`](Transformer_Predictive_Maintenance)** —
+  Python data pipeline + classical ML / deep learning training, runnable
+  locally or on Google Colab. Loads the raw sensor CSVs, engineers causal
+  rolling-window features, builds a stratified train/dev/test split, trains
+  and compares Logistic Regression / Random Forest / Gradient Boosting
+  baselines against a small MCU-friendly Keras MLP, and exports everything
+  needed for on-device deployment.
+- **[`Transformer_MCU_Deployment/`](Transformer_MCU_Deployment)** —
+  Arduino/PlatformIO firmware (Uno-ready, ~2.7 KB flash for the model) that
+  runs the exported MLP directly on an MCU, with a built-in self-test mode
+  that replays real held-out samples and verifies its predictions match
+  the PC/Colab-trained model to float precision.
+
